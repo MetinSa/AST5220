@@ -125,14 +125,16 @@ contains
     allocate(rho_lambda(n_eta))
     allocate(rho_crit(n_eta))
 
-    ! Calculating the density parameters as a function of eta
+    ! Calculating the critical density
     do i = 1, n_eta
-       rho_crit(i) = (3*get_H(x_eta(i))**2)/(8*pi*G_grav)         ! Critical density
-       rho_m(i) = (Omega_m * rho_c) * a_eta(i)**-3                ! Matter density
-       rho_b(i) = (Omega_b * rho_c) * a_eta(i)**-3                ! Baryon density
-       rho_r(i) = (Omega_r * rho_c) * a_eta(i)**-4                ! Radiation density
-       rho_lambda(i) = (Omega_lambda * rho_c)                     ! Dark energy density
+       rho_crit(i) = (3*get_H(x_eta(i))**2)/(8*pi*G_grav)
     end do
+
+    rho_m = (Omega_m * rho_c) * a_eta**-3                ! Matter density
+    rho_b = (Omega_b * rho_c) * a_eta**-3                ! Baryon density
+    rho_r = (Omega_r * rho_c) * a_eta**-4                ! Radiation density
+    rho_lambda = (Omega_lambda * rho_c)                  ! Dark energy density
+
 
 
     !-----------------------------------------------------------------------
