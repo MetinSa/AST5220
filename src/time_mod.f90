@@ -149,7 +149,7 @@ contains
     ! Using the ODE-solver
     do i = 2, (n_eta)
        eta(i) = eta(i-1)
-       call odeint(eta(i:i), x_eta(i-1), x_eta(i), epsilon, steplength, steplength_min, d_eta_da, bsstep, output)
+       call odeint(eta(i:i), x_eta(i-1), x_eta(i), epsilon, steplength, steplength_min, d_eta_da, rkqs, output)
     end do
 
     ! Forward Euler method (scrapped)
