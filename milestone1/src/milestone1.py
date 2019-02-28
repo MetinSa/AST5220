@@ -4,8 +4,6 @@ from matplotlib import rc
 
 savepath = "../milestone1/figures/"
 
-MPc= 3.085e22
-
 # Reading in grids and eta
 x_eta, a_eta, z_eta, eta  = np.loadtxt("grids.dat", unpack = True)
 
@@ -22,6 +20,9 @@ x_t, eta_splint  = np.loadtxt("splined.dat", unpack = True)
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size = 15)
 
+
+# km to mpc
+kmmpc = 3.086e19
 def etaplot():
 
     # Plotting eta
@@ -34,6 +35,14 @@ def etaplot():
     plt.ylabel(r"$\eta$")
     plt.legend()
     plt.savefig(savepath + "eta.pdf")
+
+    plt.figure(2)
+    plt.title("Conformal time (Splined)")
+    plt.semilogy(x_t, eta_splint, color = "royalblue")
+    plt.grid(linestyle = "--")
+    plt.xlabel("x = log $a$")
+    plt.ylabel(r"$\eta$")
+    plt.savefig(savepath + "eta_spline.pdf")
     plt.show()
 
 #etaplot()
@@ -43,23 +52,25 @@ def hubbleplot():
     # Plotting the hubble parameter as a function of x and z
     plt.figure(1)
     plt.title("Hubble parameter as a function of x")
-    plt.semilogy(x_eta, H_x, color = "royalblue")
+    plt.semilogy(x_eta, H_x*kmmpc, color = "royalblue")
     plt.grid(linestyle = "--")
     plt.xlabel("x = log $a$")
-    plt.ylabel(r"H$(x)$")
+    plt.ylabel(r"H$(x)$ [(km/s)/Mpc]")
     plt.savefig(savepath + "H_x.pdf")
 
     plt.figure(2)
     plt.title("Hubble parameter as a function of z")
-    plt.loglog(z_eta, H_x, color = "royalblue")
+    plt.plot(z_eta, H_x*kmmpc, color = "royalblue")
     plt.grid(linestyle = "--")
     plt.xlabel("z")
-    plt.ylabel(r"$H(z) $")
+    plt.ylabel(r"H$(z)$ [(km/s)/Mpc]")
     plt.gca().invert_xaxis()
     plt.savefig(savepath + "H_z.pdf")
 
 
     plt.show()
+
+    print((H_x*kmmpc)[-1])
 
 hubbleplot()
 
@@ -73,10 +84,11 @@ def densityplot():
     plt.ylabel(r"$\Omega$")
     plt.plot(x_eta, Omega_m, label = r"$\Omega_m$", color = "royalblue")
     plt.plot(x_eta, Omega_b, label = r"$\Omega_b$", color = "darkorange")
+    plt.plot(x_eta, Omega_b+Omega_m, label = r"$\Omega_m + \Omega_b$", color = "black", linestyle = "--")
     plt.plot(x_eta, Omega_r, label = r"$\Omega_r$", color = "mediumseagreen")
-    plt.plot(x_eta, Omega_lambda, label = r"$\Omega_\lambda$", color = "crimson")
+    plt.plot(x_eta, Omega_lambda, label = r"$\Omega_\Lambda$", color = "crimson")
     plt.legend()
-    plt.savefig(savepath + "densities.pdf")
+    #plt.savefig(savepath + "densities.pdf")
     plt.show()
 
 #densityplot()

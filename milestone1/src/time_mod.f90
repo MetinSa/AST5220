@@ -94,7 +94,7 @@ contains
     do i = 1, n2
        x_t(n1+i) = x_end_rec + i*(x_0 - x_end_rec)/(n2)
     end do
-
+    
     ! Creating a-grid using x = ln a
     a_t = exp(x_t)
 

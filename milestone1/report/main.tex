@@ -77,7 +77,7 @@ urlcolor=blue}
 
 %Frontpage stuff
 \title[Milestone 1]{\Large{Milestone 1: The background evolution of the universe} \\
-\normalsize{FYS5220 - Cosmology 2}}
+\normalsize{AST5220 - Cosmology 2}}
 
 \author[San]{Metin San}
 
@@ -90,16 +90,14 @@ urlcolor=blue}
 
 \maketitle
 \begin{center}
-   \vspace*{-0.6cm} \textsc{\url{https://github.com/MetinSa/AST5220}}
+   \vspace*{-0.6cm} \textsc{\url{https://github.com/MetinSa/AST5220/tree/master/milestone1}}
 \end{center}
 
 \begin{abstract}
-    We set up the cosmological grids for the scale factor $a$, the
+    We set up cosmological grids for the scale factor $a$, the
     redshift $z$ and the parameter $x = \log a$. These are then applied
     to compute the time evolution of the background density and the
-    Hubble parameter. Finally we compute the conformal time $\eta$ and
-    spline it to interpolate between the grid points in order to
-    achieve a better accuracy at .
+    Hubble parameter. Finally we compute the conformal time $\eta$. A small region, $x \in [-7.4,0]$ of $\eta$ is then interpolated between grid points through a spline resulting in a more continuous and smooth $\eta$ estimate.
 \end{abstract}
 
 \section{Introduction}
@@ -119,8 +117,10 @@ results and figures can be found on my Github by following the link
 below the author name on the front page.
 
 The report will consist of a theory section where we introduce and
-motivate the assumptions and theory used to make our calculations. What
-follows is the result section where we present and discuss our results.
+motivate the assumptions and theory used to make our calculations. We
+then discuss the numerical implementation and methods use to solve the
+various equations in a implementation section which is followed by a
+results section where we present and discuss our results.
 We then conclude the report with a small section where we reflect back
 on the work done.
 
@@ -144,9 +144,9 @@ parameter $x$
 \begin{equation}\label{eq: x}
     x \equiv \ln a.
 \end{equation}
-This parameter makes it easier to work with the quantities we are about
-to compute as we will mainly work with phenomena that varies strongly
-over wide time ranges. 
+This parameter represent the scale factor in a convenient way which makes it easier to work with the quantities we are about to compute;
+we mainly work with phenomena which vary over wide time
+ranges. 
 
 We proceed by considering a photon which propagates in this Universe.
 The line element for the photon is equal to zero, meaning that equation
@@ -261,13 +261,14 @@ that the expression is reduced to
 \end{equation}
 We know that the Universe was radiation dominated at early times
 meaning that the Hubble parameter can be written as $H = H_0
-\sqrt{\Omega_r a^{-4}}$. Inserting this this into \eqref{eq: eta_init},
+\sqrt{\Omega_r a^{-4}}$. Inserting this into \eqref{eq: eta_init},
 we find the follow initial condition for the conformal time
 \begin{equation}
     \eta(a_\text{init}) = \frac{c a_\text{init}}{H_0 \Omega_r^{1/2}}.
 \end{equation}
-We proceed by computing a spline through the resulting $\eta$ data
-using the provided program \textbf{spline\_1D\_mod}. This helps us
+Once we have aquired the conformal time, we proceed by computing a spline through the resulting $\eta$ data in
+the region $x \in [-7.4, 0]$ (the non-conformal time grids) using the provided program
+\textbf{spline\_1D\_mod.f90}. This helps us
 resolve the $\eta$ values between the grid points of interest, and will
 come in handy in future calculations.
 
@@ -283,19 +284,16 @@ come in handy in future calculations.
 
 The results of the fractional density evolution calculation is seen in
 figure \ref{fig: dens}. As expected, we see that the universe starts of
-in an era dominated by $\Omega_r$, the radiation. The dark matter,
+in an era dominated by $\Omega_r$, the radiation as it scales with $a^{-4}$. The dark matter,
 $\Omega_m$ overtakes the radiation at $x \approx 8$ and continues to
 dominate the universe until around $x \approx 1 $ at which the dark
 energy $\Omega_\Lambda$ takes over. The baryons follow the same
 behavior as the dark matter as expected since they both scale with
-$a^{-3}$ with a lower overall amplitude.
+$a^{-3}$ with a lower overall amplitude. The sum of the densities are at all time unity as expected. A curiosity is that the matter contribution ($\Omega_m + \Omega_b$) roughly equals that of the dark energy contribution today.
 
 The results of the Hubble parameter calculation can be seen in figures
 \ref{fig: H_x} and \ref{fig: H_z} where we have plotted the results
-both as functions of the parameter $x$ and the redshift $z$. Both
-curves follow the same behaviour. It should be noted that the the
-$z$-axis in figure \ref{fig: H_z} has been flipped in order to resemble
-figure \ref{fig: H_x}.
+both as functions of the parameter $x$ and the redshift $z$. $H(x)$ has been plotted in a log-y plot to better resolve the behaviour. The plots are of units [(km/s)/Mpc] which are the standard units used when describing the Hubble parameter. A quick comparison shows that our computed $H_0$ is $H(x=0) = 70.007$ (km/s)/Mpc. Estimates of the Hubble parameter today range from $65-75$ (km/s)/Mpc, with the Planck estimate\footnote{\url{http://sci.esa.int/planck/60504-measurements-of-the-hubble-constant/}} being $67.74 \pm 0.46$ (km/s)/Mpc. This means that our model (even without accounting for neutrinos) does a good job of reproducing the Hubble parameter.
 
 \begin{figure}
     \centering
@@ -315,9 +313,9 @@ figure \ref{fig: H_x}.
 
 The calculated conformal time can be seen in figure \ref{fig: eta}
 which also includes the splined data. The splined curve only resolves
-the area of $x < 7$ as this seems to be the epoch where the conformal
-time changes behaviour. This is likely connected to the fact that the
-Universe goes from being radiation dominated to dark matter dominated.
+the area of $x \in [-7.4, 0]$ as this seems to be the epoch where the conformal
+time changes behaviour. This might be connected to the fact that the
+Universe goes from being radiation dominated to dark matter dominated around this time.
 
 \begin{figure}
     \centering
