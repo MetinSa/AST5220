@@ -11,14 +11,15 @@ module rec_mod
 !-----------------------------------------------------------------------
 
 
-  integer(i4b),                        private :: n                     ! Number of grid points
-  real(dp), allocatable, dimension(:), private :: x_rec, a_rec, z_rec   ! x-grid for recombination
-  real(dp), allocatable, dimension(:), private :: tau, tau2, tau22      ! tau, tau' and tau''
-  real(dp), allocatable, dimension(:), private :: n_e, n_e2             ! Electron density
-  real(dp), allocatable, dimension(:), private :: logn_e, logn_e2       ! (log of) electron density, n_e
-  real(dp), allocatable, dimension(:), private :: s_tau, s_tau2, s_tau22! Splined quantities of tau
-  real(dp), allocatable, dimension(:), private :: g, g2, g22            ! Visibility function g, g' and g''
-  real(dp), allocatable, dimension(:), private :: s_g, s_g2, s_g22      ! Splined visibility function
+  integer(i4b),                        private :: n                         ! Number of grid points
+  real(dp), allocatable, dimension(:), private :: x_rec, a_rec, z_rec       ! x-grid for recombination
+  real(dp), allocatable, dimension(:), private :: tau, tau2, tau22          ! tau, tau' and tau''
+  real(dp), allocatable, dimension(:), private :: n_e, n_e2                 ! Electron density
+  real(dp), allocatable, dimension(:), private :: logn_e, logn_e2           ! (log of) electron density, n_e
+  real(dp), allocatable, dimension(:), private :: logtau, logtau2, logtau22 ! (log of) optical depth, tau
+  real(dp), allocatable, dimension(:), private :: s_tau, s_tau2, s_tau22    ! Splined quantities of tau
+  real(dp), allocatable, dimension(:), private :: g, g2, g22                ! Visibility function g, g' and g''
+  real(dp), allocatable, dimension(:), private :: s_g, s_g2, s_g22          ! Splined visibility function
 
 contains
 
@@ -58,6 +59,9 @@ contains
     allocate(n_e2(n))
     allocate(logn_e(n))
     allocate(logn_e2(n))
+    allocate(logtau(n))
+    allocate(logtau2(n))
+    allocate(logtau22(n))
     allocate(g(n))
     allocate(g2(n))
     allocate(g22(n))
@@ -135,10 +139,17 @@ contains
     
     end do
 
+
+    tau(n) = tau(n-1)
     ! Computing the splined (log of) optical depth
     ! Computing the splined second derivative of (log of) optical depth
+    logtau = log(tau)
+
     call spline(x_rec, tau, yp1, yp2, tau2)
     call spline(x_rec, tau2, yp1, yp2, tau22)
+
+    call spline(x_rec, logtau, yp1, yp2, logtau2)
+    call spline(x_rec, logtau2, yp1, yp2, logtau22)
 
 !-----------------------------------------------------------------------
 ! Computing the optical depth and visibility function
@@ -174,7 +185,7 @@ contains
        s_g22(i) = get_ddg(x_rec(i))
 
     end do
- 
+    write(*,*) s_tau22
 !-----------------------------------------------------------------------
 ! Writing data to files
 !-----------------------------------------------------------------------
@@ -270,7 +281,7 @@ contains
     real(dp), intent(in) :: x
     real(dp)             :: get_tau
 
-    get_tau = splint(x_rec, tau, tau2, x)
+    get_tau = exp(splint(x_rec, logtau, logtau2, x))
 
   end function get_tau
 
@@ -282,7 +293,7 @@ contains
     real(dp), intent(in) :: x
     real(dp)             :: get_dtau
 
-    get_dtau = splint_deriv(x_rec, tau, tau2, x)
+    get_dtau = get_tau(x)*splint_deriv(x_rec, logtau, logtau2, x)
 
   end function get_dtau
 
@@ -294,7 +305,7 @@ contains
     real(dp), intent(in) :: x
     real(dp)             :: get_ddtau
 
-    get_ddtau = splint(x_rec, tau2, tau22, x)
+    get_ddtau = splint(x_rec, logtau2, logtau22, x)*get_tau(x) + get_dtau(x)**2.d0/get_tau(x)
 
   end function get_ddtau
 
